@@ -66,9 +66,6 @@ describe 'PubSub' do
   end
 
   describe 'publish' do
-    before :each do
-    end
-
     it 'should publish the event called' do
       @mock.should_receive(:qwer)
       expect(@mock).not_to receive :asdf
