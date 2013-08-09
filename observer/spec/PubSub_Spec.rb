@@ -6,52 +6,40 @@ describe 'PubSub' do
 
   before :each do
     @ps = PubSub.new
+    @ps.subscribe 'button2Click' do
+      @mock.qwer
+    end
+
+    @ps.subscribe 'button1Click' do
+      @mock.asdf
+    end
     allow_message_expectations_on_nil
   end
 
   describe 'subscribe' do
-    it 'should subscribe an event' do
-      expect(@mock).not_to receive :qwer
+    it 'should subscribe an event but not call it' do
+      expect(@mock).not_to receive :zxcv
 
       @ps.subscribe 'button2Click' do
-        @mock.qwer
+        @mock.zxcv
       end
     end
 
     it 'should handle multiple subscriptions' do
       expect(@mock).not_to receive :qwer
-
-      @ps.subscribe 'button2Click' do
-        @mock.qwer
-      end
-
-      @ps.subscription.length.should eq 1
-
       expect(@mock).not_to receive :asdf
-
-      @ps.subscribe 'button1Click' do
-        @mock.asdf
-      end
 
       @ps.subscription.length.should eq 2
     end
 
-    it 'should not overwrite if given a key it already has but should add the block' do
+    it 'should not overwrite if given a key it already has it but should add the block' do
       expect(@mock).not_to receive :qwer
 
       @ps.subscribe 'button1Click' do
         @mock.qwer
       end
 
-      @ps.subscription.length.should eq 1
-
       expect(@mock).not_to receive :asdf
-
-      @ps.subscribe 'button1Click' do
-        @mock.asdf
-      end
-
-      @ps.subscription.length.should eq 1
       @ps.subscription['button1Click'].length.should eq 2
     end
 
@@ -78,15 +66,10 @@ describe 'PubSub' do
   end
 
   describe 'publish' do
+    before :each do
+    end
+
     it 'should publish the event called' do
-      @ps.subscribe 'button2Click' do
-        @mock.qwer
-      end
-
-      @ps.subscribe 'button1Click' do
-        @mock.asdf
-      end
-
       @mock.should_receive(:qwer)
       expect(@mock).not_to receive :asdf
 
@@ -96,14 +79,6 @@ describe 'PubSub' do
     it 'should publish all the blocks for a certain event' do
       @ps.subscribe 'button2Click' do
         @mock.qwer
-      end
-
-      @ps.subscribe 'button2Click' do
-        @mock.qwer
-      end
-
-      @ps.subscribe 'button1Click' do
-        @mock.asdf
       end
 
       @mock.should_receive(:qwer).twice
@@ -118,14 +93,6 @@ describe 'PubSub' do
     it 'should remove the subscription of the events associated' do
       id1 = @ps.subscribe 'button2Click' do
         @mock.zxcv
-      end
-
-      @ps.subscribe 'button2Click' do
-        @mock.qwer
-      end
-
-      @ps.subscribe 'button1Click' do
-        @mock.asdf
       end
 
       @mock.should_receive :qwer
