@@ -6,15 +6,15 @@ class PubSub
     @id = 0
   end
 
-  def subscribe eventName, &block
+  def subscribe event_name, &block
     id = generate_id
 
-    @subscription[eventName][id] = block
-    [eventName, id]
+    @subscription[event_name][id] = block
+    [event_name, id]
   end
 
-  def publish eventName
-    @subscription.fetch(eventName).each_value(&:call)
+  def publish event_name
+    @subscription.fetch(event_name).each_value(&:call)
   end
 
   def unsubscribe id
