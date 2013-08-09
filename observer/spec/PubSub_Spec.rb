@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'PubSub' do
 
-  let(:mock) {double(qwer: nil, asdf: nil)}
+  let(:mock) {double(qwer: nil, asdf: nil, zxcv: nil)}
 
   before :each do
     @ps = PubSub.new
@@ -54,6 +54,27 @@ describe 'PubSub' do
       @ps.subscription.length.should eq 1
       @ps.subscription['button1Click'].length.should eq 2
     end
+
+    it 'should return a unique id' do
+      ids = []
+      ids.push @ps.subscribe 'button1Click' do
+        @mock.qwer
+      end
+
+      ids.push @ps.subscribe 'button1Click' do
+        @mock.qwer
+      end
+
+      ids.push @ps.subscribe 'button1Click' do
+        @mock.qwer
+      end
+
+      ids.push @ps.subscribe 'button1Click' do
+        @mock.qwer
+      end
+
+      ids.uniq.length.should eq ids.length
+    end
   end
 
   describe 'publish' do
@@ -90,6 +111,30 @@ describe 'PubSub' do
 
       @ps.publish('button2Click')
 
+    end
+  end
+
+  describe 'unsubscribe' do
+    it 'should remove the subscription of the events associated' do
+      id1 = @ps.subscribe 'button2Click' do
+        @mock.zxcv
+      end
+
+      @ps.subscribe 'button2Click' do
+        @mock.qwer
+      end
+
+      @ps.subscribe 'button1Click' do
+        @mock.asdf
+      end
+
+      @mock.should_receive :qwer
+      @mock.should_receive :asdf
+      expect(@mock).not_to receive :zxcv
+
+      @ps.unsubscribe id1
+      @ps.publish('button2Click')
+      @ps.publish('button1Click')
     end
   end
 end
