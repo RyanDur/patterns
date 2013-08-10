@@ -6,6 +6,7 @@ describe 'PubSub' do
 
   before :each do
     @ps = PubSub.new
+
     @ps.subscribe 'button2Click' do
       @mock.qwer
     end
@@ -13,16 +14,13 @@ describe 'PubSub' do
     @ps.subscribe 'button1Click' do
       @mock.asdf
     end
+
     allow_message_expectations_on_nil
   end
 
   describe 'subscribe' do
     it 'should subscribe an event but not call it' do
-      expect(@mock).not_to receive :zxcv
-
-      @ps.subscribe 'button2Click' do
-        @mock.zxcv
-      end
+      expect(@mock).not_to receive :qwer
     end
 
     it 'should handle multiple subscriptions' do
@@ -88,7 +86,7 @@ describe 'PubSub' do
 
   describe 'unsubscribe' do
     it 'should remove the subscription of the events associated' do
-      id1 = @ps.subscribe 'button2Click' do
+      id = @ps.subscribe 'button2Click' do
         @mock.zxcv
       end
 
@@ -96,7 +94,7 @@ describe 'PubSub' do
       @mock.should_receive :asdf
       expect(@mock).not_to receive :zxcv
 
-      @ps.unsubscribe id1
+      @ps.unsubscribe id
       @ps.publish('button2Click')
       @ps.publish('button1Click')
     end
